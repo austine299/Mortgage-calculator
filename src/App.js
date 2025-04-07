@@ -290,12 +290,12 @@ function App() {
                   <h1 className="text-custom-bg font-bold text-5xl">
                     ${monthlyRepayment}
                   </h1>
-                  <hr className="text-slate-400" />
+                  <hr className="text-slate-400 mt-2" />
 
-                  <h6 className="text-slate-400 font-bold">
+                  <h6 className="text-slate-400 font-bold mt-2">
                     Total you will pay over the term
                   </h6>
-                  <h2 className="text-white font-bold text-4xl">
+                  <h2 className="text-white font-bold text-2xl">
                     ${totalYearly}
                   </h2>
                 </div>
