@@ -10,6 +10,18 @@ function App() {
   const [totalYearly, setTotalYearly] = useState("");
   const [monthlyRepayment, setMonthlyRepayment] = useState("");
   const [output, setOutput] = useState(false);
+  const [selectedValue, setSelectedValue] = useState(null);
+  const [totalInterest, setTotalInterest] = useState("");
+  const [repayment, setRepayment] = useState(false);
+  const [amountErro, setAmountErro] = useState();
+  const [numOfYear, setNumOfYear] = useState();
+  const [repayWithInterest, setRepayWithInterest] = useState();
+
+  let mp = 0;
+  let p = amount;
+  let r = interest / 100 / 12;
+  let n = year * 12;
+  let yearlyPay;
 
   const handleYearInput = (e) => {
     const newValue = e.target.value;
@@ -21,54 +33,118 @@ function App() {
     setAmount(newValue);
   };
 
-  let mp = 0;
-  let p = amount;
-  let r = interest / 100;
-  let t = year;
-  let yearlyPay;
-  let n = 12 * t;
-  let apr = r / 12;
+  const handleChange = (event) => {
+    setSelectedValue(event.target.checked ? event.target.value : null);
+  };
 
-  const handleCalculate = () => {
-    r = interest / 100;
-    mp = ((p * apr) / 1 - 1 / (1 + apr)) ^ n;
-    setMonthlyRepayment(mp);
+  const handleCalculate = (event) => {
+    if (amount && year !== "") {
+      mp = (p * r) / (1 - Math.pow(1 + r, -n));
+      setMonthlyRepayment(mp.toFixed(2));
 
-    yearlyPay = mp * n;
+      yearlyPay = mp * n;
 
-    setTotalYearly(yearlyPay);
-    setOutput(!output);
-    setAmount("");
+      setTotalYearly(yearlyPay.toFixed(2));
+      setOutput(!output);
+      setOutput(true);
+    } else {
+      setOutput(false);
+    }
+
+    if (amount === "") {
+      setAmountErro("This field is requaired");
+    } else {
+      setAmountErro();
+    }
+    if (year === "") {
+      setNumOfYear("This field is requaired");
+    } else {
+      setNumOfYear();
+    }
+
+    if (selectedValue !== event.target.checked) {
+      setRepayWithInterest("This field is requaired");
+    } else {
+      setRepayWithInterest();
+    }
+  };
+
+  const handleInterest = () => {
+    if (totalInterest === "") {
+      const myInterest = totalYearly - p;
+      setTotalInterest(myInterest.toFixed(2));
+      
+    }
+    setRepayment(false);
+  };
+
+  const handleYearlyRepayment = () => {
+    if (repayment !== "") {
+      setRepayment(!repayment);
+    }
+    setRepayment(true);
+  };
+
+  const handleClear = () => {
+    setSelectedValue(false);
     setYear("");
+    setAmount("");
+    setTotalYearly("");
+    setMonthlyRepayment("");
+    setOutput(false);
   };
 
   return (
     <div className="bg-blue-50 w-screen h-screen flex justify-center items-center">
-      <div className="bg-white sm:w-2/3 h-5/6 flex flex-col sm:flex-row  sm:gap-8 justify-between rounded-r-3xl">
+      <div className="bg-white sm:w-2/3 h-auto   flex flex-col sm:flex-row  sm:gap-8 justify-between rounded-r-3xl">
         <div className=" sm:w-2/4 p-8">
           <div className="flex flex-col sm:flex-row gap-4 justify-between">
             <h1 className="text-slate-900 font-bold text-2xl">
               Mortgage Calculator
             </h1>
-            <a className="text-slate-500 hover:underline" href="index.html">
+            <button
+              onClick={handleClear}
+              className="text-slate-500 hover:underline"
+              href="index.html"
+            >
               Clear All
-            </a>
+            </button>
           </div>
           <div className="mt-11 ">
             <div>
               <label className="text-slate-500">Mortgage Amount</label>
-              <div className="w-full h-10 border-2 flex rounded-lg mt-2">
-                <span className="w-8 bg-blue-50 text-center flex items-center justify-center rounded-l-lg text-slate-500">
-                  $
-                </span>
-                <input
-                  required
-                  className="w-full border-0 rounded-r-lg p-4"
-                  type="text"
-                  value={amount}
-                  onChange={handleAmountInput}
-                />
-              </div>
+              {amountErro ? (
+                <div className="">
+                  <div className="w-full h-10 border-2 flex rounded-lg mt-2">
+                    <span className="w-8 bg-red-600 text-center flex items-center justify-center rounded-l-lg text-white">
+                      $
+                    </span>
+                    <input
+                      required
+                      className="w-full border-0 rounded-r-lg p-4"
+                      type="text"
+                      value={amount}
+                      onChange={handleAmountInput}
+                    />
+                  </div>
+                  <span className="text-red-600">{amountErro}</span>
+                </div>
+              ) : (
+                <div className="">
+                  <div className="w-full h-10 border-2 flex rounded-lg mt-2">
+                    <span className="w-8 bg-blue-50 text-center flex items-center justify-center rounded-l-lg text-slate-500">
+                      $
+                    </span>
+                    <input
+                      required
+                      className="w-full border-0 rounded-r-lg p-4"
+                      type="text"
+                      value={amount}
+                      onChange={handleAmountInput}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex justify-between mt-4">
               <div className="w-5/12">
@@ -81,10 +157,17 @@ function App() {
                     value={year}
                     onChange={handleYearInput}
                   />
-                  <span className="w-auto p-1 bg-blue-50 text-center flex items-center justify-center rounded-r-lg text-slate-500">
-                    years
-                  </span>
+                  {numOfYear ? (
+                    <span className="w-auto p-1 bg-red-600 text-center flex items-center justify-center rounded-r-lg text-white">
+                      years
+                    </span>
+                  ) : (
+                    <span className="w-auto p-1 bg-blue-50 text-center flex items-center justify-center rounded-r-lg text-slate-500">
+                      years
+                    </span>
+                  )}
                 </div>
+                <span className="text-red-600">{numOfYear}</span>
               </div>
 
               <div className="w-5/12">
@@ -106,11 +189,18 @@ function App() {
               </div>
             </div>
 
-            <div className="mt-8">
+            {repayWithInterest ? <div className="mt-8">
               <label className="text-slate-500">Mortgage Amount</label>
               <div className="w-full h-10 border-2 flex rounded-lg mt-2">
                 <span className="w-8 bg-blue-50 text-center flex items-center justify-center rounded-l-lg">
-                  <input className="" type="radio" />
+                  <input
+                    onClick={handleYearlyRepayment}
+                    className=""
+                    type="radio"
+                    value="repayment"
+                    checked={selectedValue === "repayment"}
+                    onChange={handleChange}
+                  />
                 </span>
                 <span className="flex items-center text-custom-blue text-{20px} font-medium  ml-5">
                   Repayment
@@ -118,35 +208,66 @@ function App() {
               </div>
               <div className="w-full h-10 border-2 flex rounded-lg mt-2">
                 <span className="w-8 bg-blue-50 text-center flex items-center justify-center rounded-l-lg">
-                  <input className="" type="radio" />
+                  <input
+                    onClick={handleInterest}
+                    className=""
+                    type="radio"
+                    value="interest"
+                    checked={selectedValue === "interest"}
+                    onChange={handleChange}
+                  />
                 </span>
+
                 <span className="flex items-center text-custom-blue text-{20px} font-medium  ml-5">
                   Interest Only
                 </span>
               </div>
-            </div>
-            {amount ===0 && year === 0 ? (
-              <button
-                onClick={handleCalculate}
-                className="bg-custom-bg w-full sm:w-7/12 rounded-3xl h-11 mt-8 text-custom-blue font-bold flex 
+            </div>:<div className="mt-8">
+              <label className="text-slate-500">Mortgage Amount</label>
+              <div className="w-full h-10 border-2 flex rounded-lg mt-2">
+                <span className="w-8 bg-blue-50 text-center flex items-center justify-center rounded-l-lg">
+                  <input
+                    onClick={handleYearlyRepayment}
+                    className=""
+                    type="radio"
+                    value="repayment"
+                    checked={selectedValue === "repayment"}
+                    onChange={handleChange}
+                  />
+                </span>
+                <span className="flex items-center text-custom-blue text-{20px} font-medium  ml-5">
+                  Repayment
+                </span>
+              </div>
+              <div className="w-full h-10 border-2 flex rounded-lg mt-2">
+                <span className="w-8 bg-blue-50 text-center flex items-center justify-center rounded-l-lg">
+                  <input
+                    onClick={handleInterest}
+                    className=""
+                    type="radio"
+                    value="interest"
+                    checked={selectedValue === "interest"}
+                    onChange={handleChange}
+                  />
+                </span>
+
+                <span className="flex items-center text-custom-blue text-{20px} font-medium  ml-5">
+                  Interest Only
+                </span>
+              </div>
+              <span className="">{repayWithInterest}</span>
+            </div>}
+
+            <button
+              onClick={handleCalculate}
+              className="bg-custom-bg w-full sm:w-7/12 rounded-3xl h-11 mt-8 text-custom-blue font-bold flex 
                 justify-center items-center gap-2 p-2 text-{20px} sm:text-xs"
-              >
-                <span className="">
-                  <img className="" src={calc} alt="calc" />
-                </span>
-                Calculate Repayments
-              </button>
-            ) : (
-              <button
-                className="bg-custom-bg w-full sm:w-7/12 rounded-3xl h-11 mt-8 text-custom-blue font-bold flex 
-              justify-center items-center gap-2 p-2 text-{20px} sm:text-xs"
-              >
-                <span className="">
-                  <img className="" src={calc} alt="calc" />
-                </span>
-                Calculate Repayments
-              </button>
-            )}
+            >
+              <span className="">
+                <img className="" src={calc} alt="calc" />
+              </span>
+              Calculate Repayments
+            </button>
           </div>
         </div>
         {output ? (
@@ -159,22 +280,36 @@ function App() {
             </p>
             <div
               className="border-t-8 border-t-custom-bg rounded-2xl 
-            bg-slate-900 h-2/4 mt-6 flex flex-col justify-center gap-3 p-4"
+            bg-slate-900 h-2/4 mt-6 flex flex-col justify-center gap-3 p-6 sm:p-4"
             >
-              <span className="text-slate-400 font-bold">
-                Your monthly repayments
-              </span>
-              <h1 className="text-custom-bg font-bold text-5xl">
-                ${monthlyRepayment}
-              </h1>
-              <hr className="text-slate-400" />
+              {repayment ===true ? (
+                <div>
+                  <h6 className="text-slate-400 font-bold">
+                    Your monthly repayments
+                  </h6>
+                  <h1 className="text-custom-bg font-bold text-5xl">
+                    ${monthlyRepayment}
+                  </h1>
+                  <hr className="text-slate-400" />
 
-              <span className="text-slate-400 font-bold">
-                Total you will pay over the term
-              </span>
-              <h12 className="text-white font-bold text-4xl">
-                ${totalYearly}
-              </h12>
+                  <h6 className="text-slate-400 font-bold">
+                    Total you will pay over the term
+                  </h6>
+                  <h2 className="text-white font-bold text-4xl">
+                    ${totalYearly}
+                  </h2>
+                </div>
+              ) : (
+                <div>
+                  <h6 className="text-slate-400 font-bold">
+                    Total interest repayments
+                  </h6>
+                  <h1 className="text-custom-bg font-bold text-5xl">
+                    ${totalInterest}
+                  </h1>
+                  <hr className="text-slate-400" />
+                </div>
+              )}
             </div>
           </div>
         ) : (
