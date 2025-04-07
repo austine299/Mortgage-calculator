@@ -6,7 +6,7 @@ import illustration from "./asset/images/illustration-empty.svg";
 function App() {
   const [amount, setAmount] = useState("");
   const [year, setYear] = useState("");
-  const [interest, setInterest] = useState(5.25);
+  const [interest, setInterest] = useState("");
   const [totalYearly, setTotalYearly] = useState("");
   const [monthlyRepayment, setMonthlyRepayment] = useState("");
   const [output, setOutput] = useState(false);
@@ -16,6 +16,7 @@ function App() {
   const [amountErro, setAmountErro] = useState();
   const [numOfYear, setNumOfYear] = useState();
   const [repayWithInterest, setRepayWithInterest] = useState();
+  const [rateError, setRateError] = useState()
 
   let mp = 0;
   let p = amount;
@@ -31,6 +32,11 @@ function App() {
   const handleAmountInput = (e) => {
     const newValue = e.target.value;
     setAmount(newValue);
+  };
+
+  const handleInterestInput = (e) => {
+    const newValue = e.target.value;
+    setInterest(newValue);
   };
 
   const handleChange = (event) => {
@@ -67,13 +73,18 @@ function App() {
     } else {
       setRepayWithInterest();
     }
+
+    if (interest === "") {
+      setRateError("This field is requaired");
+    } else {
+      setRateError();
+    }
   };
 
   const handleInterest = () => {
     if (totalInterest === "") {
       const myInterest = totalYearly - p;
       setTotalInterest(myInterest.toFixed(2));
-      
     }
     setRepayment(false);
   };
@@ -178,85 +189,98 @@ function App() {
                     className="w-full border-0 rounded-l-lg p-4"
                     type="text"
                     value={interest}
+                    onChange={handleInterestInput}
                   />
-                  <span
-                    className="w-8   bg-blue-50 text-center flex items-center justify-center 
+                  {rateError ? (
+                    <span
+                      className="w-8   bg-red-600 text-center flex items-center justify-center 
+                      rounded-r-lg text-white"
+                    >
+                      %
+                    </span>
+                  ) : (
+                    <span
+                      className="w-8   bg-blue-50 text-center flex items-center justify-center 
                       rounded-r-lg text-slate-500"
-                  >
-                    %
-                  </span>
+                    ></span>
+                  )}
                 </div>
+                <span className="text-red-600">{numOfYear}</span>
               </div>
             </div>
 
-            {repayWithInterest ? <div className="mt-8">
-              <label className="text-slate-500">Mortgage Amount</label>
-              <div className="w-full h-10 border-2 flex rounded-lg mt-2">
-                <span className="w-8 bg-blue-50 text-center flex items-center justify-center rounded-l-lg">
-                  <input
-                    onClick={handleYearlyRepayment}
-                    className=""
-                    type="radio"
-                    value="repayment"
-                    checked={selectedValue === "repayment"}
-                    onChange={handleChange}
-                  />
-                </span>
-                <span className="flex items-center text-custom-blue text-{20px} font-medium  ml-5">
-                  Repayment
-                </span>
-              </div>
-              <div className="w-full h-10 border-2 flex rounded-lg mt-2">
-                <span className="w-8 bg-blue-50 text-center flex items-center justify-center rounded-l-lg">
-                  <input
-                    onClick={handleInterest}
-                    className=""
-                    type="radio"
-                    value="interest"
-                    checked={selectedValue === "interest"}
-                    onChange={handleChange}
-                  />
-                </span>
+            {repayWithInterest ? (
+              <div className="mt-8">
+                <label className="text-slate-500">Mortgage Amount</label>
+                <div className="w-full h-10 border-2 flex rounded-lg mt-2">
+                  <span className="w-8 bg-blue-50 text-center flex items-center justify-center rounded-l-lg">
+                    <input
+                      onClick={handleYearlyRepayment}
+                      className=""
+                      type="radio"
+                      value="repayment"
+                      checked={selectedValue === "repayment"}
+                      onChange={handleChange}
+                    />
+                  </span>
+                  <span className="flex items-center text-custom-blue text-{20px} font-medium  ml-5">
+                    Repayment
+                  </span>
+                </div>
+                <div className="w-full h-10 border-2 flex rounded-lg mt-2">
+                  <span className="w-8 bg-blue-50 text-center flex items-center justify-center rounded-l-lg">
+                    <input
+                      onClick={handleInterest}
+                      className=""
+                      type="radio"
+                      value="interest"
+                      checked={selectedValue === "interest"}
+                      onChange={handleChange}
+                    />
+                  </span>
 
-                <span className="flex items-center text-custom-blue text-{20px} font-medium  ml-5">
-                  Interest Only
-                </span>
+                  <span className="flex items-center text-custom-blue text-{20px} font-medium  ml-5">
+                    Interest Only
+                  </span>
+                </div>
               </div>
-            </div>:<div className="mt-8">
-              <label className="text-slate-500">Mortgage Amount</label>
-              <div className="w-full h-10 border-2 flex rounded-lg mt-2">
-                <span className="w-8 bg-blue-50 text-center flex items-center justify-center rounded-l-lg">
-                  <input
-                    onClick={handleYearlyRepayment}
-                    className=""
-                    type="radio"
-                    value="repayment"
-                    checked={selectedValue === "repayment"}
-                    onChange={handleChange}
-                  />
-                </span>
-                <span className="flex items-center text-custom-blue text-{20px} font-medium  ml-5">
-                  Repayment
-                </span>
-              </div>
-              <div className="w-full h-10 border-2 flex rounded-lg mt-2">
-                <span className="w-8 bg-blue-50 text-center flex items-center justify-center rounded-l-lg">
-                  <input
-                    onClick={handleInterest}
-                    className=""
-                    type="radio"
-                    value="interest"
-                    checked={selectedValue === "interest"}
-                    onChange={handleChange}
-                  />
-                </span>
+            ) : (
+              <div className="mt-8">
+                <label className="text-slate-500">Mortgage Amount</label>
+                <div className="w-full h-10 border-2 flex rounded-lg mt-2">
+                  <span className="w-8 bg-blue-50 text-center flex items-center justify-center rounded-l-lg">
+                    <input
+                      onClick={handleYearlyRepayment}
+                      className=""
+                      type="radio"
+                      value="repayment"
+                      checked={selectedValue === "repayment"}
+                      onChange={handleChange}
+                    />
+                  </span>
+                  <span className="flex items-center text-custom-blue text-{20px} font-medium  ml-5">
+                    Repayment
+                  </span>
+                </div>
+                <div className="w-full h-10 border-2 flex rounded-lg mt-2">
+                  <span className="w-8 bg-blue-50 text-center flex items-center justify-center rounded-l-lg">
+                    <input
+                      onClick={handleInterest}
+                      className=""
+                      type="radio"
+                      value="interest"
+                      checked={selectedValue === "interest"}
+                      onChange={handleChange}
+                    />
+                  </span>
 
-                <span className="flex items-center text-custom-blue text-{20px} font-medium  ml-5">
-                  Interest Only
-                </span>
+                  <span className="flex items-center text-custom-blue text-{20px} font-medium  ml-5">
+                    Interest Only
+                  </span>
+                </div>
+                <span className="">{repayWithInterest}</span>
               </div>
-              <span className="">{repayWithInterest}</span>
-            </div>}
+            )}
 
             <button
               onClick={handleCalculate}
@@ -282,7 +306,7 @@ function App() {
               className="border-t-8 border-t-custom-bg rounded-2xl 
             bg-slate-900 h-2/4 mt-6 flex flex-col justify-center gap-3 p-6 sm:p-4"
             >
-              {repayment ===true ? (
+              {repayment === true ? (
                 <div>
                   <h6 className="text-slate-400 font-bold">
                     Your monthly repayments
